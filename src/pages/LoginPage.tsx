@@ -3,6 +3,7 @@ import { Sparkles, Mail, Key, LogIn, ArrowRight } from "lucide-react";
 import { useAuth } from "../hooks/useAuth";
 import { useAppStore } from "../store/AppContext";
 import { authSendOtp, authVerifyOtp } from "../lib/supabase";
+import { getAuthSession } from "../lib/supabase";
 import Button from "../components/ui/Button";
 
 type Step = "email" | "otp";
@@ -57,6 +58,32 @@ export default function LoginPage() {
       await handleLogin(email.trim().toLowerCase());
     } catch {
       setError("Verification failed. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // If Supabase sent a magic link, the user clicks it in their email which creates
+  // a client session. This button lets the user tell the app to check for that session
+  // and continue once Supabase has authenticated them.
+  const handleCheckMagicLink = async () => {
+    if (!email.trim()) return;
+    setError("");
+    setLoading(true);
+    try {
+      const session = await getAuthSession();
+      if (!session || !session.user) {
+        setError("No active session yet. Click the link in your email, then press Continue.");
+        return;
+      }
+      const sessionEmail = (session.user.email || "").toLowerCase();
+      if (sessionEmail !== email.trim().toLowerCase()) {
+        setError("Signed in with a different email. Use the same address you entered.");
+        return;
+      }
+      await handleLogin(email.trim().toLowerCase());
+    } catch {
+      setError("Failed to verify sign-in link. Please try again.");
     } finally {
       setLoading(false);
     }
