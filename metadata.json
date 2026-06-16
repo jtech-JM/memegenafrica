@@ -1,0 +1,6 @@
+{
+  "name": "MemeGen Africa",
+  "description": "Africa's leading AI-powered content creation platform, providing localized high-engagement memes, captions, and atomic credit workflows across regional payments.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
